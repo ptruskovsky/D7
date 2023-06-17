@@ -35,8 +35,8 @@ namespace Problem3 {
 
         static void Main(string[] args) {
             Dialog();
-            Calculate();
-            RenderResults();
+            var results = Calculate();
+            RenderResults(results);
             Console.ReadLine();
         }
 
@@ -150,22 +150,107 @@ namespace Problem3 {
 
         }
 
-        private static void Calculate() 
+        private static IEnumerable<double> Calculate() 
         {
-            foreach(var row in _dataset.DatasetRows) 
-            { 
-                for (var n = 0; n < row.NumberOfPieces - n; n++) 
-                { 
-                    
+            foreach(var test in _dataset.DatasetRows) 
+            {
+                var numberOfPieces = test.NumberOfPieces;
+                double[] cuts = new double[numberOfPieces];
+                
+                for (var n = 0; n < test.NumberOfPieces; n++) 
+                {
+                    if (n == 0) 
+                    {
+                        cuts[0] = 0;
+                        continue;
+                    }
+
+                    var testValue = cuts[n - 1] + test.ThettaInRadians;
+
+                    cuts[n] = testValue > Math.PI * 2 ?
+                              testValue - Math.PI * 2 :
+                              testValue; 
+;
                 }
+
+                var orderedCuts = cuts.OrderBy(c => c);
+                var cutsArray = new List<double> { Math.PI * 2 }.Concat(orderedCuts).OrderBy(c => c).ToArray();
+                var maxAngle = MaxSortedAdjacentDiff(cutsArray, cutsArray.Length);
+                var maxArea = AreaOfSector(maxAngle, test.Radius);
+
+                yield return maxArea;
             }
         }
 
+        private static double MaxSortedAdjacentDiff(double[] arr, int n) {
+  
+            double maxVal = arr[0];
+            double minVal = arr[0];
+            for (int i = 1; i < n; i++) 
+            {
+                maxVal = Math.Max(maxVal, arr[i]);
+                minVal = Math.Min(minVal, arr[i]);
+            }
 
-        private static void RenderResults() {
-            var answer = 0;
-            Console.WriteLine(answer.ToString("0.00000"));
+            double[] maxBucket = new double[n - 1];
+            double[] minBucket = new double[n - 1];
+            maxBucket = maxBucket.Select(i => double.MinValue).ToArray();
+            minBucket = minBucket.Select(i => double.MaxValue).ToArray();
+
+            double delta = (double)(maxVal - minVal) / (double)(n - 1);
+
+            for (int i = 0; i < n; i++)
+            {
+                if (arr[i] == maxVal || arr[i] == minVal) 
+                {
+                    continue;
+                }
+
+                var indexTest = (Math.Floor((arr[i] - minVal) / delta));
+                int index = (int)(Math.Floor((arr[i] - minVal) / delta));
+
+                if (maxBucket[index] == double.MinValue) 
+                {
+                    maxBucket[index] = arr[i];
+                }
+                else 
+                {
+                    maxBucket[index] = Math.Max(maxBucket[index], arr[i]);
+                }
+
+                if (minBucket[index] == double.MaxValue) 
+                {
+                    minBucket[index] = arr[i];
+                }
+                else 
+                {
+                    minBucket[index] = Math.Min(minBucket[index], arr[i]);
+                }
+            }
+
+            double prev_val = minVal;
+            double max_gap = 0;
+            for (int i = 0; i < n - 1; i++) 
+            {
+                if (minBucket[i] == double.MaxValue) 
+                {
+                    continue;
+                }
+                max_gap = Math.Max(max_gap, minBucket[i] - prev_val);
+                prev_val = maxBucket[i];
+            }
+
+            max_gap = Math.Max(max_gap, maxVal - prev_val);
+
+            return max_gap;
         }
 
+
+        private static void RenderResults(IEnumerable<double> results) {
+            foreach(var answer in results) 
+            {
+                Console.WriteLine(answer.ToString("0.000000"));
+            }
+        }
     }
 }
