@@ -1,0 +1,15 @@
+C:\Users\Pavel\Desktop\D7\Porblem1\bin\Debug\net6.0\Porblem1.exe
+C:\Users\Pavel\Desktop\D7\Porblem1\bin\Debug\net6.0\Porblem1.deps.json
+C:\Users\Pavel\Desktop\D7\Porblem1\bin\Debug\net6.0\Porblem1.runtimeconfig.json
+C:\Users\Pavel\Desktop\D7\Porblem1\bin\Debug\net6.0\Porblem1.dll
+C:\Users\Pavel\Desktop\D7\Porblem1\bin\Debug\net6.0\Porblem1.pdb
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\Porblem1.csproj.AssemblyReference.cache
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\Porblem1.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\Porblem1.AssemblyInfoInputs.cache
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\Porblem1.AssemblyInfo.cs
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\Porblem1.csproj.CoreCompileInputs.cache
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\Porblem1.dll
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\refint\Porblem1.dll
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\Porblem1.pdb
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\Porblem1.genruntimeconfig.cache
+C:\Users\Pavel\Desktop\D7\Porblem1\obj\Debug\net6.0\ref\Porblem1.dll
