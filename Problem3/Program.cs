@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 #nullable enable
 
@@ -20,42 +22,19 @@ namespace Problem3 {
         private const int MIN_NUMBER_OF_TESTS = 1;
         private const int MAX_NUMBER_OF_TESTS = 200;
 
-        private static readonly Dataset _dataset = new();
-
-        private class Dataset {
-            public List<DatasetRow> DatasetRows { get; set; } = new List<DatasetRow>();
-        }
-
-        private struct DatasetRow {
-            public int Radius { get; set; }
-            public int NumberOfPieces { get; set;}
-            public double ThettaInRadians { get; set; }
-        }
-
-
-        static void Main(string[] args) {
-            Dialog();
-            var results = Calculate();
-            RenderResults(results);
+        static void Main(string[] args) 
+        {
+            Calculate();
             Console.ReadLine();
         }
 
-        private static double DegreesToRadians(int angle, int minutes, int seconds) 
-            => (angle * Math.PI / 180) + (minutes * (Math.PI / (180 * 60))) + (seconds * (Math.PI / (180 * 60 * 60)));
-
-        private static double AreaOfSector(double angleInRadians, int radius)
-            => 0.5 * Math.Pow(radius,2) * angleInRadians;
-
         private static (int? radius, int? numberOfPieces, int? thettaDegrees, int? thettaMinutes, int? thettaSeconds) GetPizzaParametersFromInput(string? inputPizzaParams) 
         {
-
             int? paramRadius = null;
             int? paramNumberOfPieces = null;
             int? paramThettaDegrees = null;
             int? paramThettaMinutes = null;
             int? paramThettaSeconds = null;
- 
-
 
             if (string.IsNullOrWhiteSpace(inputPizzaParams)) 
             {
@@ -71,10 +50,10 @@ namespace Problem3 {
 
             if (int.TryParse(pizzaParams[0], out var radiusResult)) 
             {
-                paramRadius = radiusResult;    
+                paramRadius = radiusResult;
             }
 
-            if (int.TryParse(pizzaParams[1], out var numberOfPiecesResult))
+            if (int.TryParse(pizzaParams[1], out var numberOfPiecesResult)) 
             {
                 paramNumberOfPieces = numberOfPiecesResult;
             }
@@ -85,12 +64,12 @@ namespace Problem3 {
             }
 
             if (int.TryParse(pizzaParams[3], out var thettaMinutesResult)) 
-            { 
+            {
                 paramThettaMinutes = thettaMinutesResult;
             }
 
             if (int.TryParse(pizzaParams[4], out var thettaSecondsResult)) 
-            { 
+            {
                 paramThettaSeconds = thettaSecondsResult;
             }
 
@@ -98,7 +77,7 @@ namespace Problem3 {
         }
 
         private static int? GetNumberOfTestsFromInput(string? numberOfTestsInput) 
-        { 
+        {
             int? numberOfTests = null;
             if (int.TryParse(numberOfTestsInput, out var numberOfTestsResult)) 
             {
@@ -107,57 +86,36 @@ namespace Problem3 {
             return numberOfTests;
         }
 
-        private static bool IsRadiusValid(int? radius) 
-            => radius > MIN_RADIUS && radius <= MAX_RADIUS;
-
-        private static bool IsNumberOfPiecesValid(int? numberOfPiceses)
-            => numberOfPiceses > MIN_NUMBER_OF_PIECES && numberOfPiceses <= MAX_NUMBER_OF_PIECES;
-
-        private static bool IsAngleValid(int? degrees, int? minutes, int? seconds)
-            => degrees >= MIN_DEGREES && degrees <= MAX_DEGREES && minutes >= MIN_MINUTES && minutes <= MAX_MINUTES && seconds >= MIN_SECONDS && seconds <= MAX_SECONDS;
-
-        private static bool IsNumberOfTestsValid(int? numberOfTests)
-            => numberOfTests >= MIN_NUMBER_OF_TESTS && numberOfTests <= MAX_NUMBER_OF_TESTS;
-
-
-        public static void Dialog() 
+        public static void Calculate() 
         {
             int? numberOfTests = null;
+            var pi2 = Math.PI * 2;
+            var pi2List = new List<double>(1) { pi2 };
+            
 
-            while (!IsNumberOfTestsValid(numberOfTests)) 
+            while (!(numberOfTests >= MIN_NUMBER_OF_TESTS && numberOfTests <= MAX_NUMBER_OF_TESTS)) 
             {
                 numberOfTests = GetNumberOfTestsFromInput(Console.ReadLine());
             }
 
-            for (var i = 0; i < numberOfTests; i++) 
+            var result = new List<double>(numberOfTests.Value);
+
+            for (var i = 0; i < numberOfTests; i++)
             {
                 var (radius, numberOfPieces, thettaDegrees, thettaMinutes, thettaSeconds) = GetPizzaParametersFromInput(Console.ReadLine());
 
-                while (!IsRadiusValid(radius) || !IsNumberOfPiecesValid(numberOfPieces) 
-                        || !IsAngleValid(thettaDegrees, thettaMinutes, thettaSeconds)) 
+                while (!(radius > MIN_RADIUS && radius <= MAX_RADIUS) || !(numberOfPieces > MIN_NUMBER_OF_PIECES && numberOfPieces <= MAX_NUMBER_OF_PIECES)
+                        || !(thettaDegrees >= MIN_DEGREES && thettaDegrees <= MAX_DEGREES && thettaMinutes >= MIN_MINUTES && thettaMinutes <= MAX_MINUTES && thettaSeconds >= MIN_SECONDS && thettaSeconds <= MAX_SECONDS)) 
                 {
                     (radius, numberOfPieces, thettaDegrees, thettaMinutes, thettaSeconds) = GetPizzaParametersFromInput(Console.ReadLine());
                 }
 
-                var datasetRow = new DatasetRow {
-                    Radius = radius!.Value,
-                    NumberOfPieces = numberOfPieces!.Value,
-                    ThettaInRadians = DegreesToRadians(thettaDegrees!.Value, thettaMinutes!.Value, thettaSeconds!.Value)
-                };
+                var testNumberOfPieces = numberOfPieces!.Value;
+                var testThettaInRadians = (thettaDegrees!.Value * Math.PI / 180) + (thettaMinutes!.Value * (Math.PI / (180 * 60))) + (thettaSeconds!.Value * (Math.PI / (180 * 60 * 60)));
 
-                _dataset.DatasetRows.Add(datasetRow);
-            }
+                double[] cuts = new double[testNumberOfPieces];
 
-        }
-
-        private static IEnumerable<double> Calculate() 
-        {
-            foreach(var test in _dataset.DatasetRows) 
-            {
-                var numberOfPieces = test.NumberOfPieces;
-                double[] cuts = new double[numberOfPieces];
-                
-                for (var n = 0; n < test.NumberOfPieces; n++) 
+                for (var n = 0; n < testNumberOfPieces; n++) 
                 {
                     if (n == 0) 
                     {
@@ -165,92 +123,38 @@ namespace Problem3 {
                         continue;
                     }
 
-                    var testValue = cuts[n - 1] + test.ThettaInRadians;
-
-                    cuts[n] = testValue > Math.PI * 2 ?
-                              testValue - Math.PI * 2 :
-                              testValue; 
-;
+                    var testValue = cuts[n - 1] + testThettaInRadians;
+                    cuts[n] = testValue > pi2 ? testValue - pi2 : testValue;
                 }
+           
+                var cutsItems = pi2List.Concat(cuts).OrderBy(c => c).ToList();
+                var maxArea = FindMaxDiff(cutsItems) * 0.5 * radius!.Value * radius!.Value;
 
-                var orderedCuts = cuts.OrderBy(c => c);
-                var cutsArray = new List<double> { Math.PI * 2 }.Concat(orderedCuts).OrderBy(c => c).ToArray();
-                var maxAngle = MaxSortedAdjacentDiff(cutsArray, cutsArray.Length);
-                var maxArea = AreaOfSector(maxAngle, test.Radius);
+                result.Add(maxArea);
+            }
 
-                yield return maxArea;
+            foreach(var item in result) 
+            {
+                Console.WriteLine(item.ToString("0.000000"));
             }
         }
 
-        private static double MaxSortedAdjacentDiff(double[] arr, int n) {
-  
-            double maxVal = arr[0];
-            double minVal = arr[0];
-            for (int i = 1; i < n; i++) 
+        private static double FindMaxDiff(List<double> items) 
+        {
+            double result = 0;
+        
+            for (var i = 1; i < items.Count; i++) 
             {
-                maxVal = Math.Max(maxVal, arr[i]);
-                minVal = Math.Min(minVal, arr[i]);
-            }
+                var previous = items.ElementAt(i - 1);
+                var current = items.ElementAt(i);
 
-            double[] maxBucket = new double[n - 1];
-            double[] minBucket = new double[n - 1];
-            maxBucket = maxBucket.Select(i => double.MinValue).ToArray();
-            minBucket = minBucket.Select(i => double.MaxValue).ToArray();
-
-            double delta = (double)(maxVal - minVal) / (double)(n - 1);
-
-            for (int i = 0; i < n; i++)
-            {
-                if (arr[i] == maxVal || arr[i] == minVal) 
+                if ((current - previous) > result) 
                 {
-                    continue;
-                }
-
-                var indexTest = (Math.Floor((arr[i] - minVal) / delta));
-                int index = (int)(Math.Floor((arr[i] - minVal) / delta));
-
-                if (maxBucket[index] == double.MinValue) 
-                {
-                    maxBucket[index] = arr[i];
-                }
-                else 
-                {
-                    maxBucket[index] = Math.Max(maxBucket[index], arr[i]);
-                }
-
-                if (minBucket[index] == double.MaxValue) 
-                {
-                    minBucket[index] = arr[i];
-                }
-                else 
-                {
-                    minBucket[index] = Math.Min(minBucket[index], arr[i]);
+                    result = current - previous;
                 }
             }
 
-            double prev_val = minVal;
-            double max_gap = 0;
-            for (int i = 0; i < n - 1; i++) 
-            {
-                if (minBucket[i] == double.MaxValue) 
-                {
-                    continue;
-                }
-                max_gap = Math.Max(max_gap, minBucket[i] - prev_val);
-                prev_val = maxBucket[i];
-            }
-
-            max_gap = Math.Max(max_gap, maxVal - prev_val);
-
-            return max_gap;
-        }
-
-
-        private static void RenderResults(IEnumerable<double> results) {
-            foreach(var answer in results) 
-            {
-                Console.WriteLine(answer.ToString("0.000000"));
-            }
+            return result;
         }
     }
 }
