@@ -28,13 +28,11 @@ namespace Problem3 {
             Console.ReadLine();
         }
 
-        private static (int? radius, int? numberOfPieces, int? thettaDegrees, int? thettaMinutes, int? thettaSeconds) GetPizzaParametersFromInput(string? inputPizzaParams) 
+        private static (int radius, int numberOfPieces, int thettaDegrees, int thettaMinutes, int thettaSeconds) GetPizzaParametersFromInput(string? inputPizzaParams) 
         {
-            int? paramRadius = null;
-            int? paramNumberOfPieces = null;
-            int? paramThettaDegrees = null;
-            int? paramThettaMinutes = null;
-            int? paramThettaSeconds = null;
+            int paramRadius, paramNumberOfPieces, paramThettaDegrees, paramThettaMinutes, paramThettaSeconds;
+            paramRadius = paramNumberOfPieces = paramThettaDegrees = paramThettaMinutes = paramThettaSeconds = -1;
+  
 
             if (string.IsNullOrWhiteSpace(inputPizzaParams)) 
             {
@@ -76,9 +74,9 @@ namespace Problem3 {
             return (paramRadius, paramNumberOfPieces, paramThettaDegrees, paramThettaMinutes, paramThettaSeconds);
         }
 
-        private static int? GetNumberOfTestsFromInput(string? numberOfTestsInput) 
+        private static int GetNumberOfTestsFromInput(string? numberOfTestsInput) 
         {
-            int? numberOfTests = null;
+            int numberOfTests = 0;
             if (int.TryParse(numberOfTestsInput, out var numberOfTestsResult)) 
             {
                 numberOfTests = numberOfTestsResult;
@@ -90,15 +88,13 @@ namespace Problem3 {
         {
             int? numberOfTests = null;
             var pi2 = Math.PI * 2;
-            var pi2List = new List<double>(1) { pi2 };
             
-
             while (!(numberOfTests >= MIN_NUMBER_OF_TESTS && numberOfTests <= MAX_NUMBER_OF_TESTS)) 
             {
                 numberOfTests = GetNumberOfTestsFromInput(Console.ReadLine());
             }
 
-            var result = new List<double>(numberOfTests.Value);
+            var result = new List<string>(numberOfTests.Value);
 
             for (var i = 0; i < numberOfTests; i++)
             {
@@ -110,32 +106,30 @@ namespace Problem3 {
                     (radius, numberOfPieces, thettaDegrees, thettaMinutes, thettaSeconds) = GetPizzaParametersFromInput(Console.ReadLine());
                 }
 
-                var testNumberOfPieces = numberOfPieces!.Value;
-                var testThettaInRadians = (thettaDegrees!.Value * Math.PI / 180) + (thettaMinutes!.Value * (Math.PI / (180 * 60))) + (thettaSeconds!.Value * (Math.PI / (180 * 60 * 60)));
+                var testNumberOfPieces = numberOfPieces;
+                var testThettaInRadians = (thettaDegrees * Math.PI / 180) + (thettaMinutes * (Math.PI / (180 * 60))) + (thettaSeconds * (Math.PI / (180 * 60 * 60)));
 
-                double[] cuts = new double[testNumberOfPieces];
-
-                for (var n = 0; n < testNumberOfPieces; n++) 
+                double current = 0;
+                var pi2List = new List<double>(testNumberOfPieces + 1) { pi2, 0 };
+                
+                for (var n = 2; n < testNumberOfPieces + 1; n++) 
                 {
-                    if (n == 0) 
-                    {
-                        cuts[0] = 0;
-                        continue;
-                    }
-
-                    var testValue = cuts[n - 1] + testThettaInRadians;
-                    cuts[n] = testValue > pi2 ? testValue - pi2 : testValue;
+                    var testValue = pi2List[n - 1] + testThettaInRadians;
+                    current = testValue > pi2 ? testValue - pi2 : testValue;
+                    pi2List.Add(current);
                 }
-           
-                var cutsItems = pi2List.Concat(cuts).OrderBy(c => c).ToList();
-                var maxArea = FindMaxDiff(cutsItems) * 0.5 * radius!.Value * radius!.Value;
 
-                result.Add(maxArea);
+                var cutsItems = pi2List.OrderBy(c => c).ToList();
+                var maxArea = FindMaxDiff(cutsItems) * 0.5 * radius * radius;
+
+                result.Add(maxArea.ToString("0.000000"));
             }
+
+            Console.Clear();
 
             foreach(var item in result) 
             {
-                Console.WriteLine(item.ToString("0.000000"));
+                Console.WriteLine(item);
             }
         }
 
@@ -145,8 +139,8 @@ namespace Problem3 {
         
             for (var i = 1; i < items.Count; i++) 
             {
-                var previous = items.ElementAt(i - 1);
-                var current = items.ElementAt(i);
+                var previous = items[i - 1];
+                var current = items[i];
 
                 if ((current - previous) > result) 
                 {
