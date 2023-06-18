@@ -9,7 +9,6 @@ namespace Problem2
 {
     internal class Program 
     {
-
         public const int MIN_NUMBER_OF_CLEARINGS = 2;
         public const int MAX_NUMBER_OF_CLEARINGS = 20;
         public const int MIN_NUMBER_OF_PATHS = 1;
@@ -33,7 +32,6 @@ namespace Problem2
             public int Y { get; set; }
         }
 
-        // TODO !
         private static double GetAverageTime(List<WayPoint> dataset) 
         {
             var starting = GetStartingPoint(dataset);
@@ -41,29 +39,35 @@ namespace Problem2
             int totalMinutes = 0;
             int totalAttempts = 0;
             
-            var zeroPoints = dataset.Where(el => el.X == starting).ToList();
+            var zeroPoints = dataset.Where(el => el.X == starting);
 
             foreach (var zeroPoint in zeroPoints) 
             {
+                var counter = Go(dataset, zeroPoint, exit, 0);
                 totalAttempts++;
-                Go(dataset, zeroPoint, exit, ref totalMinutes, ref totalAttempts);
+                totalMinutes += counter * ONE_ATTEMPT_TIME_MINUTES;
             }
 
             return (double)totalMinutes / totalAttempts;    
         }
         
-        // TODO !
-        private static WayPoint Go(List<WayPoint> dataset, WayPoint currentPoint, int exit, ref int totalMinutes, ref int totalAttempts) 
+        // need to fix actual calculation or algo itself
+        // just passing through graph seems to be not enough
+        private static int Go(List<WayPoint> dataset, WayPoint currentPoint, int exit, int counter) 
         {
-            totalMinutes += ONE_ATTEMPT_TIME_MINUTES;
-    
+            counter++;
+
             if (!IsWayout(exit, currentPoint)) 
             {
-                var nextPoint = dataset.FirstOrDefault(el => el.X == currentPoint.Y);
-                currentPoint = Go(dataset, nextPoint, exit, ref totalMinutes, ref totalAttempts);
+                var nextPoints = dataset.Where(el => el.X == currentPoint.Y);
+
+                foreach (var nextPoint in nextPoints)
+                {
+                    counter = Go(dataset, nextPoint, exit, counter);
+                }
             }
 
-            return currentPoint;
+            return counter;
         }
 
         private static bool IsWayout(int endPoint, WayPoint wayPoint) 
@@ -121,7 +125,8 @@ namespace Problem2
             var numberOfPaths = 0;
 
             while (!(numberOfClearings >= MIN_NUMBER_OF_CLEARINGS && numberOfClearings <= MAX_NUMBER_OF_CLEARINGS) ||
-                 !(numberOfPaths >= MIN_NUMBER_OF_PATHS)) {
+                 !(numberOfPaths >= MIN_NUMBER_OF_PATHS)) 
+            {
                 (numberOfClearings, numberOfPaths) = GetInitialParams(Console.ReadLine());
             }
 
