@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 #nullable enable
 
 namespace Problem3 {
-    internal class Program {
+    internal class Program 
+    {
 
         private const int MIN_RADIUS = 0;
         private const int MAX_RADIUS = 100;
