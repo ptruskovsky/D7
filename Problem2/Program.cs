@@ -59,8 +59,10 @@ namespace Problem2
 
             if (!IsWayout(exit, currentPoint)) 
             {
-                var nextPoints = dataset.Where(el => el.X == currentPoint.Y);
+                counter += counter; // coming back if there is no exit from this point
 
+                var nextPoints = dataset.Where(el => el.X == currentPoint.Y);
+                
                 foreach (var nextPoint in nextPoints)
                 {
                     counter = Go(dataset, nextPoint, exit, counter);
